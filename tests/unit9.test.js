@@ -13,6 +13,9 @@ test('Perform Login:', async ({ page }) => {
   //const title = page.locator('span[data-test="title"]');
   //expect(title).toBeVisible;
 
+  const shoppingCart =  page.locator('span[data-test="shopping_cart_link"]');
+  expect(shoppingCart).toBeVisible;
+  
   const products =  page.locator('div[data-test="inventory-item"]');
   const productCount = await products.count();
 
@@ -30,7 +33,6 @@ test(' Add product to the cart:', async ({ page }) => {
 
     await page.locator('button[data-test="add-to-cart-sauce-labs-backpack"]').click();
 
-    //await page.waitForTimeout(5000)
     const cartIcon =  page.locator('span[data-test="shopping-cart-badge"]');
     expect(cartIcon).toHaveText('1');
 

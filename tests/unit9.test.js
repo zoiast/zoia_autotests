@@ -1,60 +1,42 @@
 const { test, expect } = require('@playwright/test');
+const { signIn } = require('../fixture.js');
+const { login } = require('../login.js');
+
+test.beforeEach(async ({ page }) => {
+  await page.goto('https://www.saucedemo.com/');
+  await login(page, signIn);
+  await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
+});
 
 test('Perform Login:', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-  await page.getByPlaceholder('Username').fill('standard_user');
-  await page.getByPlaceholder('Password').fill('secret_sauce');
-  await page.locator('input[data-test="login-button"]').click();
-  expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
+  await expect(page.getByTestId('title')).toBeVisible(); 
 
-  expect(page.getByText('Products')).toBeVisible(); 
-  //але мені здається це варік не дуже, бо такий текст 
-  //може ще з часом з*явитись. тут мабуть по data-test краще. чи ні? ось так: 
-  //const title = page.locator('span[data-test="title"]');
-  //expect(title).toBeVisible;
-
-  const shoppingCart =  page.locator('span[data-test="shopping_cart_link"]');
-  expect(shoppingCart).toBeVisible;
+  await expect(page.getByTestId('shopping-cart-link')).toBeVisible(); 
   
-  const products =  page.locator('div[data-test="inventory-item"]');
-  const productCount = await products.count();
-
-  expect(productCount).toBeGreaterThan(1);
-  await page.close();
-  });
+  await expect(page.getByTestId('inventory-item')).not.toHaveCount(0);
+});
 
 test(' Add product to the cart:', async ({ page }) => {
-    await page.goto('https://www.saucedemo.com/');
-    await page.getByPlaceholder('Username').fill('standard_user');
-    await page.getByPlaceholder('Password').fill('secret_sauce');
-    await page.locator('input[data-test="login-button"]').click();
+  await page.getByTestId('add-to-cart-sauce-labs-backpack').click();
 
-    expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
+  const cartIcon = page.getByTestId('shopping-cart-badge');
+  await expect(cartIcon).toHaveText('1');
 
-    await page.locator('button[data-test="add-to-cart-sauce-labs-backpack"]').click();
+  const productPage = await page.getByTestId('item-4-title-link').textContent();
 
-    const cartIcon =  page.locator('span[data-test="shopping-cart-badge"]');
-    expect(cartIcon).toHaveText('1');
+  const cart =  page.getByTestId('shopping-cart-link');
+  await cart.click();
 
-    const productPage = await page.textContent('div[data-test="inventory-item-name"]');
+  const cartPage = await page.getByTestId('item-4-title-link').textContent();
+  expect(productPage).toBe(cartPage);
 
-    const cart =  page.locator('a[data-test="shopping-cart-link"]');
-    await cart.click();
+  await page.getByTestId('continue-shopping').click();
 
-    const cartPage = await page.textContent('div[data-test="inventory-item-name"]');
-    expect(productPage).toBe(cartPage);
+  await page.getByTestId('remove-sauce-labs-backpack').click();
 
-    await page.locator('button[data-test="continue-shopping"]').click();
+  await expect(cartIcon).toHaveCount(0);
 
-    await page.locator('button[data-test="remove-sauce-labs-backpack"]').click();
+  await cart.click();
 
-    await expect(cartIcon).toHaveCount(0);
-
-    await cart.click();
-
-    const product = page.locator('div[data-test="inventory-item"]');
-    await expect(product).toHaveCount(0);
-
-    await page.close();
-
-  })
+  await expect(page.getByTestId('inventory-item')).toHaveCount(0);
+});

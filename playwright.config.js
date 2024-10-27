@@ -31,6 +31,7 @@ module.exports = defineConfig({
     trace: 'on-first-retry',
     headless: false,
     testIdAttribute: 'data-test',
+    baseURL: 'https://www.saucedemo.com/',
   },
 
   /* Configure projects for major browsers */

@@ -1,11 +1,12 @@
 const { test, expect } = require('@playwright/test');
-const { signIn } = require('../fixture.js');
-const { login } = require('../login.js');
+
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-  await login(page, signIn);
-  await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
+  await page.goto('/'); 
+  await page.getByTestId('username').fill('standard_user');
+  await page.getByTestId('password').fill('secret_sauce');
+  await page.getByTestId('login-button').click();
+  await expect(page).toHaveURL('/inventory.html');
 });
 
 test('Perform Login:', async ({ page }) => {

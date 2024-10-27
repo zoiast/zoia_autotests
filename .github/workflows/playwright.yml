@@ -25,7 +25,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
-        run: npx playwright test
+        run: xvfb-run -a npx playwright test
       - name: Upload report to GitHub Actions Artifacts
         if: always()
         uses: actions/upload-artifact@v4
